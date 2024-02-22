@@ -8,7 +8,7 @@
 import Foundation
 public class HttpClient {
     
-    let session: HTTPURLSession
+    private let session: HTTPURLSession
     
     public init(_ session: HTTPURLSession) {
         self.session = session
@@ -16,6 +16,12 @@ public class HttpClient {
     
     public func performRequest(_ request: URLRequest) async throws -> (data: Data, response: URLResponse) {
         
-        try await session.data(for: request)
+        do {
+            let result = try await session.data(for: request)
+            return result
+        }
+        catch {
+            throw APIError.connectivity
+        }
     }
 }

@@ -7,8 +7,21 @@
 
 import Foundation
 
-public enum APIError: Swift.Error {
+public enum APIError: Swift.Error, Equatable {
     case invalidData
     case serverDefined(String)
-    case noResponse
+    case connectivity
+    
+    public static func == (lhs: APIError, rhs: APIError) -> Bool {
+        switch (lhs, rhs) {
+        case (.invalidData, .invalidData):
+            return true
+        case (.connectivity, .connectivity):
+            return true
+        case (.serverDefined(let reasonLHS), .serverDefined(let reasonRHS)):
+            return reasonLHS == reasonRHS
+        default:
+            return false
+        }
+    }
 }
