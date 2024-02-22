@@ -7,7 +7,7 @@ let package = Package(
     name: "APIModule",
     platforms: [
         .iOS(.v13),
-        .macOS(.v10_13)
+        .macOS(.v12)
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.

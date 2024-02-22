@@ -8,9 +8,9 @@
 import Foundation
 public class HttpClient {
     
-    let session: URLSession
+    let session: HTTPURLSession
     
-    public init(_ session: URLSession) {
+    public init(_ session: HTTPURLSession) {
         self.session = session
     }
     
