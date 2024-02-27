@@ -8,7 +8,6 @@
 import Foundation
 import APIModule
 class HTTPURLSessionSpy: HTTPURLSession {
- 
     private var messages = [URL : (Data, HTTPURLResponse)]()
     var executedURLs: [URL] = []
     
@@ -20,7 +19,7 @@ class HTTPURLSessionSpy: HTTPURLSession {
         messages[url] = response
     }
 
-    public func data(for request: URLRequest) async throws -> (Data, URLResponse) {
+    public func data(for request: URLRequest) async throws -> (data: Data, response: HTTPURLResponse) {
         executedURLs.append(request.url!)
         guard let result = messages[request.url!] else {
             throw "some error"

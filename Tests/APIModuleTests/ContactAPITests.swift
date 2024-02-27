@@ -37,13 +37,57 @@ final class ContactAPITests: XCTestCase {
         let (sut, session) = makeSUT(url: url)
         
         let myContactURL = ContactEndPoint.myContacts.url(baseURL: url).url!
-        let invalidJSON = "".data(using: .utf8)!
-        session.setResponse((invalidJSON, responseWithStatusCode(200, url: myContactURL)), for: myContactURL)
+        let invalidJSON = """
+[
+{"contactsssss_ID" : 2 }
+]
+"""
+        session.setResponse((invalidJSON.data(using: .utf8)!, responseWithStatusCode(200, url: myContactURL)), for: myContactURL)
         
         do {
             _ = try await sut.getMyContacts()
         } catch let error {
             XCTAssertEqual((error as? APIError), APIError.invalidData)
+            return
+        }
+        XCTFail()
+    }
+    
+    func test_load_DeliverErroFor400Status() async throws {
+        let url = URL(string: "https://aurl.com")!
+        let (sut, session) = makeSUT(url: url)
+
+        
+        let myContactURL = ContactEndPoint.myContacts.url(baseURL: url).url!
+        session.setResponse(("".data(using: .utf8)!, responseWithStatusCode(400, url: url)), for: myContactURL)
+        
+        do {
+            _ = try await sut.getMyContacts()
+        } catch let error {
+            XCTAssertEqual((error as? APIError), APIError.serverDefined("400"))
+            return
+        }
+        XCTFail()
+    }
+    
+    func test_load_deliversSuccessWith200HTTPResponseWithJSONItems() async throws {
+        let url = URL(string: "https://aurl.com")!
+        let (sut, session) = makeSUT(url: url)
+
+        
+        let validJSON = """
+[
+{"contact_ID" : 2 }
+]
+"""
+        let myContactURL = ContactEndPoint.myContacts.url(baseURL: url).url!
+        session.setResponse((validJSON.data(using: .utf8)!, responseWithStatusCode(200, url: url)), for: myContactURL)
+        
+        do {
+            let contacts = try await sut.getMyContacts()
+            XCTAssertEqual(contacts.count, 1)
+        } catch {
+            XCTFail()
         }
     }
     

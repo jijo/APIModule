@@ -34,7 +34,7 @@ public class ContactAPI {
     }
     public func getMyContacts() async throws -> [Contact] {
         let contactRequest = ContactEndPoint.myContacts.url(baseURL: baseURL)
-        let (data, httpResponse)  = try await client.performRequest(contactRequest)
+        let (data, httpResponse) = try await client.performRequest(contactRequest)
         return try ContactDataMapper.map(data, from: httpResponse)
     }
 }
