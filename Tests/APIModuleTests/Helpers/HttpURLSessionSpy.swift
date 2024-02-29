@@ -20,6 +20,7 @@ class HTTPURLSessionSpy: HTTPURLSession {
     }
 
     public func data(for request: URLRequest) async throws -> (data: Data, response: HTTPURLResponse) {
+        try await Task.sleep(for: .seconds(0.4))
         executedURLs.append(request.url!)
         guard let result = messages[request.url!] else {
             throw "some error"

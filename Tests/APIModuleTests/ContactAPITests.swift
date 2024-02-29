@@ -9,14 +9,6 @@ import XCTest
 import APIModule
 final class ContactAPITests: XCTestCase {
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
     func test_init_doesNotExecuteURLRequest() async {
         let (_, session) = makeSUT()
         let executedUrls = session.executedURLs
@@ -28,8 +20,10 @@ final class ContactAPITests: XCTestCase {
         do {
             _ = try await sut.getMyContacts()
         } catch let error {
-            XCTAssertEqual((error as? APIError) , APIError.connectivity)
+            XCTAssertEqual((error as? APIError), APIError.connectivity)
+            return
         }
+        XCTFail()
     }
     
     func test_deliverErrorOnInvalidJSONWith200Status() async throws {
@@ -57,7 +51,6 @@ final class ContactAPITests: XCTestCase {
         let url = URL(string: "https://aurl.com")!
         let (sut, session) = makeSUT(url: url)
 
-        
         let myContactURL = ContactEndPoint.myContacts.url(baseURL: url).url!
         session.setResponse(("".data(using: .utf8)!, responseWithStatusCode(400, url: url)), for: myContactURL)
         
@@ -74,7 +67,6 @@ final class ContactAPITests: XCTestCase {
         let url = URL(string: "https://aurl.com")!
         let (sut, session) = makeSUT(url: url)
 
-        
         let validJSON = """
 [
 {"contact_ID" : 2 }
@@ -89,6 +81,34 @@ final class ContactAPITests: XCTestCase {
         } catch {
             XCTFail()
         }
+    }
+    
+    @MainActor func test_load_DeliverConnectivityErrorIfTaskIsCancelled() async throws {
+        let url = URL(string: "https://aurl.com")!
+        
+        let (sut, session) = makeSUT(url: url)
+
+        let dataResponse = """
+[
+{"contact_ID" : 2 }
+]
+"""
+        let myContactURL = ContactEndPoint.myContacts.url(baseURL: url).url!
+        session.setResponse((dataResponse.data(using: .utf8)!, responseWithStatusCode(200, url: url)), for: myContactURL)
+        
+        let exp = expectation(description: "Wait for load completion")
+        let task = Task {
+            do {
+                let contacts = try await sut.getMyContacts()
+                exp.fulfill()
+                XCTAssertEqual(contacts.count, 0)
+            } catch let error {
+                exp.fulfill()
+                XCTAssertEqual((error as? APIError), APIError.connectivity)
+            }
+        }
+        task.cancel()
+        await fulfillment(of: [exp])
     }
     
     private func makeSUT(url: URL = URL(string: "https://somedomain.com")!) -> (sut: ContactAPI, session: HTTPURLSessionSpy) {
