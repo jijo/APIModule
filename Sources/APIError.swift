@@ -15,12 +15,15 @@ public enum APIError: Swift.Error, Equatable {
     case invalidData
     case serverDefined(String)
     case connectivity
+    case loggedOut
     
     public static func == (lhs: APIError, rhs: APIError) -> Bool {
         switch (lhs, rhs) {
         case (.invalidData, .invalidData):
             return true
         case (.connectivity, .connectivity):
+            return true
+        case (.loggedOut, .loggedOut):
             return true
         case (.serverDefined(let reasonLHS), .serverDefined(let reasonRHS)):
             return reasonLHS == reasonRHS

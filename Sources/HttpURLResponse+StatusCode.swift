@@ -11,4 +11,7 @@ public extension HTTPURLResponse {
     var isOK: Bool {
         (200..<300).contains(statusCode)
     }
+    var isLoggedOut: Bool {
+        statusCode == 401
+    }
 }

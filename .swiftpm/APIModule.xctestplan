@@ -1,0 +1,25 @@
+{
+  "configurations" : [
+    {
+      "id" : "338D95A7-B661-4600-A832-AE72928E7B6A",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testExecutionOrdering" : "random"
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : false,
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "APIModuleTests",
+        "name" : "APIModuleTests"
+      }
+    }
+  ],
+  "version" : 1
+}
